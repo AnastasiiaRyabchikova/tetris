@@ -35,4 +35,21 @@ export default class Board {
     aboveFlow(y) {
         return y >= 0 && y < ROWS;
     }
+
+
+    rotate(piece) {
+        // Clone with JSON for immutability
+        const p = JSON.parse(JSON.stringify(piece));
+        // Transpose matrix, p is the Piece.
+        for (let y = 0; y < p.shape.length; y += 1) {
+            for (let x = 0; x < y; x += 1) {
+                [p.shape[x][y], p.shape[y][x]] = [p.shape[y][x], p.shape[x][y]];
+            }
+        }
+
+        // Reverse the order of the columns.
+        p.shape.forEach((row) => row.reverse());
+
+        return p;
+    }
 }

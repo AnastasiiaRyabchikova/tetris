@@ -11,13 +11,6 @@ const KEY = {
     SPACE: 32,
 };
 
-const MOVES = {
-    [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),
-    [KEY.RIGHT]: (p) => ({ ...p, x: p.x + 1 }),
-    [KEY.DOWN]: (p) => ({ ...p, y: p.y + 1 }),
-    [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
-};
-
 const COLORS = [
     'cyan',
     'blue',
@@ -46,9 +39,8 @@ const SHAPES = [
         [0, 0, 0],
     ],
     [
-        [0, 4, 4],
-        [0, 4, 4],
-        [0, 0, 0],
+        [4, 4],
+        [4, 4],
     ],
     [
         [0, 5, 5],
@@ -69,5 +61,5 @@ const SHAPES = [
 
 Object.freeze(KEY);
 export {
-    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES, MOVES,
+    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES,
 };

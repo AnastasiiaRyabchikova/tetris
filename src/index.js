@@ -1,7 +1,7 @@
 import './scss/style.scss';
 
 import {
-    COLS, ROWS, BLOCK_SIZE, KEY, MOVES,
+    COLS, ROWS, BLOCK_SIZE, KEY,
 } from './js/constants';
 import Board from './js/board';
 import Piece from './js/piece';
@@ -16,10 +16,18 @@ ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
 
 const board = new Board();
 
+
+const MOVES = {
+    [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),
+    [KEY.RIGHT]: (p) => ({ ...p, x: p.x + 1 }),
+    [KEY.DOWN]: (p) => ({ ...p, y: p.y + 1 }),
+    [KEY.UP]: (p) => (board.rotate(p)),
+    [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
+};
+
 function play(e) {
     e.target.blur();
     board.reset();
-    console.table(board.grid);
     const piece = new Piece(ctx);
     piece.draw();
     board.piece = piece;
