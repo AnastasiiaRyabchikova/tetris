@@ -12,30 +12,35 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: __dirname + "/src/index.html",
-            inject: 'body'
-        })
+            template: `${__dirname}/src/index.html`,
+            inject: 'body',
+        }),
     ],
     module: {
-            rules: [
-                {
-                    test: /\.js$/,
-                    include: path.resolve(__dirname, 'src/js'),
-                    use: {
-                      loader: 'babel-loader',
-                      options: {
-                        presets: 'env'
-                      }
-                    }
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: [
+                    /node_modules/,
+                ],
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: [
+                            ['@babel/plugin-proposal-class-properties', { loose: true }],
+                        ],
+                    },
                 },
-                {
-                    test: /\.(sass|scss)$/,
-                    use: [
-                        'style-loader',
-                        'css-loader',
-                        'sass-loader',
-                      ],
-                },
-            ],
-        },
+            },
+            {
+                test: /\.(sass|scss)$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader',
+                ],
+            },
+        ],
+    },
 };
