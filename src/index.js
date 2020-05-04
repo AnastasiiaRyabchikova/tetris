@@ -25,14 +25,36 @@ const MOVES = {
     [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
 };
 
+
+let requestId;
+const time = { start: 0, elapsed: 0, level: 1000 };
+
+function animate(now = 0) {
+    // Update elapsed time.
+    time.elapsed = now - time.start;
+
+    // If elapsed time has passed time for current level
+    if (time.elapsed > time.level) {
+        // Restart counting from now
+        time.start = now;
+
+        board.drop();
+    }
+
+    // Clear board before drawing new state.
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    board.draw();
+    requestId = requestAnimationFrame(animate);
+}
+
 function play(e) {
     e.target.blur();
     board.reset();
     const piece = new Piece(ctx);
-    piece.draw();
     board.piece = piece;
+    animate();
 }
-
 
 document.querySelector('.play-button').addEventListener('click', play);
 document.addEventListener('keydown', (e) => {

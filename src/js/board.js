@@ -1,5 +1,5 @@
 import {
-    COLS, ROWS,
+    COLS, ROWS, COLORS,
 } from './constants';
 
 export default class Board {
@@ -51,5 +51,42 @@ export default class Board {
         p.shape.forEach((row) => row.reverse());
 
         return p;
+    }
+
+    drawBoard() {
+        this.grid.forEach((row, indexY) => {
+            row.forEach((item, indexX) => {
+                if (item > 0) {
+                    this.ctx.fillStyle = COLORS[item];
+                    this.ctx.fillRect(indexX, indexY, 1, 1);
+                }
+            });
+        });
+    }
+
+    draw() {
+        this.piece.draw();
+        this.drawBoard();
+    }
+
+
+    drop() {
+        const p = { ...this.piece, y: this.piece.y + 1 };
+        if (this.valid(p)) {
+            this.piece.move(p);
+        } else {
+            this.freeze();
+        }
+    }
+
+    freeze() {
+        this.piece.shape.forEach((row, indexY) => {
+            row.forEach((item, indexX) => {
+                if (item > 0) {
+                    this.grid[this.piece.y + indexY][this.piece.x + indexX] = item;
+                    console.log(this.grid);
+                }
+            });
+        });
     }
 }
