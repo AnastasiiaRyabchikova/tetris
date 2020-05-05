@@ -17,7 +17,7 @@ export default class Piece {
     }
 
     spawn() {
-        const typeID = this.randomizeTetrominoType(COLORS.length);
+        const typeID = this.randomize(COLORS.length);
         this.shape = SHAPES[typeID];
         this.color = COLORS[typeID];
 
@@ -26,7 +26,7 @@ export default class Piece {
         this.y = 0;
     }
 
-    randomizeTetrominoType(noOfTypes) {
+    randomize(noOfTypes) {
         return Math.floor(Math.random() * noOfTypes);
     }
 

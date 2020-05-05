@@ -14,7 +14,7 @@ ctx.canvas.height = ROWS * BLOCK_SIZE;
 
 ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
 
-const board = new Board();
+const board = new Board(ctx);
 
 
 const MOVES = {
@@ -24,7 +24,6 @@ const MOVES = {
     [KEY.UP]: (p) => (board.rotate(p)),
     [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
 };
-
 
 let requestId;
 const time = { start: 0, elapsed: 0, level: 1000 };
@@ -37,13 +36,11 @@ function animate(now = 0) {
     if (time.elapsed > time.level) {
         // Restart counting from now
         time.start = now;
-
         board.drop();
     }
 
     // Clear board before drawing new state.
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
     board.draw();
     requestId = requestAnimationFrame(animate);
 }

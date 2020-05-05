@@ -2,8 +2,16 @@ import {
     COLS, ROWS, COLORS,
 } from './constants';
 
+import Piece from './piece';
+
 export default class Board {
     grid;
+
+    ctx;
+
+    constructor(ctx) {
+        this.ctx = ctx;
+    }
 
     reset() {
         this.grid = this.getEmptyBoard();
@@ -19,7 +27,7 @@ export default class Board {
             const y = p.y + indexY;
             return (
                 this.isEmpty(item)
-                    || (this.insideWalls(x) && this.aboveFlow(y))
+                    || (this.insideWalls(x) && this.aboveFlow(y) && this.isEmptyBoardRect(x, y))
             );
         }));
     }
@@ -34,6 +42,10 @@ export default class Board {
 
     aboveFlow(y) {
         return y >= 0 && y < ROWS;
+    }
+
+    isEmptyBoardRect(x, y) {
+        return this.grid[y][x] === 0;
     }
 
 
@@ -57,7 +69,7 @@ export default class Board {
         this.grid.forEach((row, indexY) => {
             row.forEach((item, indexX) => {
                 if (item > 0) {
-                    this.ctx.fillStyle = COLORS[item];
+                    this.ctx.fillStyle = COLORS[item - 1];
                     this.ctx.fillRect(indexX, indexY, 1, 1);
                 }
             });
@@ -76,17 +88,32 @@ export default class Board {
             this.piece.move(p);
         } else {
             this.freeze();
+            this.removeFullLine();
+            this.piece = new Piece();
+            this.piece.ctx = this.ctx;
         }
     }
 
     freeze() {
-        this.piece.shape.forEach((row, indexY) => {
-            row.forEach((item, indexX) => {
+        console.log(this.piece.shape);
+        this.piece.shape.forEach((row, y) => {
+            row.forEach((item, x) => {
                 if (item > 0) {
-                    this.grid[this.piece.y + indexY][this.piece.x + indexX] = item;
-                    console.log(this.grid);
+                    this.grid[this.piece.y + y][this.piece.x + x] = item;
+                    console.log(item);
                 }
             });
+        });
+    }
+
+    removeFullLine() {
+        this.grid.forEach((row, index) => {
+            const isRowFull = row.every((item) => item > 0);
+            if (isRowFull) {
+                const arr = Array(COLS).fill(0);
+                this.grid.splice(index, 1);
+                this.grid.unshift(arr);
+            }
         });
     }
 }
