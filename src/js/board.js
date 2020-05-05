@@ -12,13 +12,19 @@ export default class Board {
 
     account;
 
+    time = { start: 0, elapsed: 0 }
+
     constructor(ctx, account) {
         this.ctx = ctx;
         this.account = account;
+        // this.time = { start: 0, elapsed: 0 };
     }
 
-    reset() {
+    resetGame() {
         this.grid = this.getEmptyBoard();
+        this.account.score = 0;
+        this.account.lines = 0;
+        this.account.level = 0;
     }
 
     getEmptyBoard() {
@@ -91,11 +97,26 @@ export default class Board {
         if (this.valid(p)) {
             this.piece.move(p);
         } else {
+            if (this.piece.y === 0) {
+                return false;
+            }
             this.freeze();
             this.removeFullLine();
             this.piece = new Piece();
             this.piece.ctx = this.ctx;
         }
+        return true;
+    }
+
+    gameOver() {
+        cancelAnimationFrame(this.requestId);
+        this.ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+        this.ctx.fillRect(0, 0, COLS, ROWS);
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(COLS * 0.15, ROWS / 5, COLS * 0.7, 3);
+        this.ctx.font = '1px Arial';
+        this.ctx.fillStyle = 'red';
+        this.ctx.fillText('GAME OVER', COLS * 0.2, ROWS * 0.29);
     }
 
     freeze() {
@@ -117,6 +138,9 @@ export default class Board {
                         : 0;
     }
 
+    setNextLevel() {
+        this.account.level += 1;
+    }
 
     removeFullLine() {
         let lines = 0;
@@ -131,7 +155,30 @@ export default class Board {
         });
         if (lines > 0) {
             this.account.lines += lines;
-            this.account.score += this.getLineClearPoints(lines);
+            this.account.score += this.getLineClearPoints(lines) * (this.account.level + 1);
+            if (this.account.lines > 9) {
+                this.setNextLevel();
+            }
         }
+    }
+
+    animate(now = 0) {
+        // Update elapsed time.
+        this.time.elapsed = now - this.time.start;
+
+        // If elapsed time has passed time for current level
+        if (this.time.elapsed > Math.max(1000 - 50 * this.account.level, 20)) {
+            // Restart counting from now
+            this.time.start = now;
+            if (!this.drop()) {
+                this.gameOver();
+                return;
+            }
+        }
+
+        // Clear board before drawing new state.
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.draw();
+        this.requestId = requestAnimationFrame(this.animate.bind(this));
     }
 }

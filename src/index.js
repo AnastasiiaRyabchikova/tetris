@@ -17,6 +17,7 @@ ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
 let account = {
     score: 0,
     lines: 0,
+    level: 0,
 };
 
 function updateAccount(key, value) {
@@ -44,33 +45,33 @@ const MOVES = {
 };
 
 
-let requestId;
+// let requestId;
 
-const time = { start: 0, elapsed: 0, level: 1000 };
+// const time = { start: 0, elapsed: 0 };
 
-function animate(now = 0) {
-    // Update elapsed time.
-    time.elapsed = now - time.start;
+// function animate(now = 0) {
+//     // Update elapsed time.
+//     time.elapsed = now - time.start;
 
-    // If elapsed time has passed time for current level
-    if (time.elapsed > time.level) {
-        // Restart counting from now
-        time.start = now;
-        board.drop();
-    }
+//     // If elapsed time has passed time for current level
+//     if (time.elapsed > Math.max(1000 - 50 * board.account.level, 20)) {
+//         console.log(now);
+//         // Restart counting from now
+//         time.start = now;
+//         board.drop();
+//     }
 
-    // Clear board before drawing new state.
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    board.draw();
-    requestId = requestAnimationFrame(animate);
-}
-
+//     // Clear board before drawing new state.
+//     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+//     board.draw();
+//     requestId = requestAnimationFrame(animate);
+// }
 function play(e) {
     e.target.blur();
-    board.reset();
+    board.resetGame();
     const piece = new Piece(ctx);
     board.piece = piece;
-    animate();
+    board.animate();
 }
 
 
@@ -83,7 +84,7 @@ document.addEventListener('keydown', (e) => {
             if (e.keyCode === KEY.DOWN) board.account.score += POINTS.SOFT_DROP;
             board.piece.move(p);
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            board.piece.draw();
+            board.draw();
         }
         if (e.keyCode === KEY.SPACE) {
             while (board.valid(p)) {
@@ -92,7 +93,7 @@ document.addEventListener('keydown', (e) => {
                 board.account.score += POINTS.HARD_DROP;
             }
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            board.piece.draw();
+            board.draw();
         }
     }
 });
