@@ -60,6 +60,16 @@ const SHAPES = [
 ];
 
 Object.freeze(KEY);
+
+const POINTS = {
+    SINGLE: 100,
+    DOUBLE: 300,
+    TRIPLE: 500,
+    TETRIS: 800,
+    SOFT_DROP: 1,
+    HARD_DROP: 2,
+};
+Object.freeze(POINTS);
 export {
-    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES,
+    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES, POINTS,
 };

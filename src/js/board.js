@@ -1,16 +1,20 @@
 import {
-    COLS, ROWS, COLORS,
+    COLS, ROWS, COLORS, POINTS,
 } from './constants';
 
 import Piece from './piece';
+
 
 export default class Board {
     grid;
 
     ctx;
 
-    constructor(ctx) {
+    account;
+
+    constructor(ctx, account) {
         this.ctx = ctx;
+        this.account = account;
     }
 
     reset() {
@@ -95,25 +99,39 @@ export default class Board {
     }
 
     freeze() {
-        console.log(this.piece.shape);
         this.piece.shape.forEach((row, y) => {
             row.forEach((item, x) => {
                 if (item > 0) {
                     this.grid[this.piece.y + y][this.piece.x + x] = item;
-                    console.log(item);
                 }
             });
         });
     }
 
+
+    getLineClearPoints(lines) {
+        return lines === 1 ? POINTS.SINGLE
+            : lines === 2 ? POINTS.DOUBLE
+                : lines === 3 ? POINTS.TRIPLE
+                    : lines === 4 ? POINTS.TETRIS
+                        : 0;
+    }
+
+
     removeFullLine() {
+        let lines = 0;
         this.grid.forEach((row, index) => {
             const isRowFull = row.every((item) => item > 0);
             if (isRowFull) {
+                lines += 1;
                 const arr = Array(COLS).fill(0);
                 this.grid.splice(index, 1);
                 this.grid.unshift(arr);
             }
         });
+        if (lines > 0) {
+            this.account.lines += lines;
+            this.account.score += this.getLineClearPoints(lines);
+        }
     }
 }

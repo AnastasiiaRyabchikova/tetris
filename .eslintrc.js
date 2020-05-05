@@ -28,6 +28,7 @@ module.exports = {
         'indent': [2, 4, {
             'SwitchCase': 1
         }],
-        'class-methods-use-this': 'off'
+        'class-methods-use-this': 'off',
+        'no-nested-ternary': 'off'
     },
 };
