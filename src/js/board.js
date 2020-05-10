@@ -1,5 +1,5 @@
 import {
-    COLS, ROWS, COLORS, POINTS, NEXTCOLS,
+    COLS, ROWS, COLORS, POINTS, NEXTCOLS, KEY, BLOCK_SIZE,
 } from './constants';
 
 import Piece from './piece';
@@ -18,14 +18,83 @@ export default class Board {
 
     time = { start: 0, elapsed: 0 }
 
-    constructor(ctx, account, ctxNext) {
-        this.ctx = ctx;
-        this.ctxNext = ctxNext;
-        this.account = account;
+    moves = {
+        [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),
+        [KEY.RIGHT]: (p) => ({ ...p, x: p.x + 1 }),
+        [KEY.DOWN]: (p) => ({ ...p, y: p.y + 1 }),
+        [KEY.UP]: (p) => (this.rotate(p)),
+        [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
+    }
+
+    constructor({
+        board, nextBoard,
+    }) {
+        this.ctx = document.querySelector(board).getContext('2d');
+        this.ctx.canvas.width = COLS * BLOCK_SIZE;
+        this.ctx.canvas.height = ROWS * BLOCK_SIZE;
+        this.ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
+
+        this.ctxNext = document.querySelector(nextBoard).getContext('2d');
+        this.ctxNext.canvas.width = NEXTCOLS * BLOCK_SIZE;
+        this.ctxNext.canvas.height = NEXTCOLS * BLOCK_SIZE;
+        this.ctxNext.scale(BLOCK_SIZE, BLOCK_SIZE);
+
+        const account = {
+            score: 0,
+            lines: 0,
+            level: 0,
+        };
+
+        function updateAccount(key, value) {
+            const elem = document.getElementById(key);
+            if (elem) elem.textContent = value;
+        }
+
+        this.account = new Proxy(account, {
+            set(target, property, value) {
+                target[property] = value;
+                updateAccount(property, value);
+                return true;
+            },
+        });
+    }
+
+    play(e) {
+        e.target.blur();
+        this.resetGame();
+        this.piece = new Piece(this.ctx);
+        this.next = new Piece(this.ctx);
+        this.next.draw(this.ctxNext);
+        this.animate();
+        document.addEventListener('keydown', (event) => this.keydownEventListener(event));
+    }
+
+    keydownEventListener(e) {
+        if (this.moves[e.keyCode]) {
+            e.preventDefault();
+            let p = this.moves[e.keyCode](this.piece);
+            if (this.valid(p)) {
+                if (e.keyCode === KEY.DOWN) this.account.score += POINTS.SOFT_DROP;
+                this.piece.move(p);
+                this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+                this.draw();
+            }
+            if (e.keyCode === KEY.SPACE) {
+                while (this.valid(p)) {
+                    this.piece.move(p);
+                    p = this.moves[KEY.DOWN](this.piece);
+                    this.account.score += POINTS.HARD_DROP;
+                }
+                this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+                this.draw();
+            }
+        }
     }
 
     resetGame() {
         this.grid = this.getEmptyBoard();
+        this.ctxNext.fillStyle = 'white';
+        this.ctxNext.fillRect(0, 0, NEXTCOLS, NEXTCOLS);
         this.account.score = 0;
         this.account.lines = 0;
         this.account.level = 0;
@@ -64,18 +133,13 @@ export default class Board {
 
 
     rotate(piece) {
-        // Clone with JSON for immutability
         const p = JSON.parse(JSON.stringify(piece));
-        // Transpose matrix, p is the Piece.
         for (let y = 0; y < p.shape.length; y += 1) {
             for (let x = 0; x < y; x += 1) {
                 [p.shape[x][y], p.shape[y][x]] = [p.shape[y][x], p.shape[x][y]];
             }
         }
-
-        // Reverse the order of the columns.
         p.shape.forEach((row) => row.reverse());
-
         return p;
     }
 

@@ -29,6 +29,7 @@ module.exports = {
             'SwitchCase': 1
         }],
         'class-methods-use-this': 'off',
-        'no-nested-ternary': 'off'
+        'no-nested-ternary': 'off',
+        'no-param-reassign': 'off'
     },
 };
