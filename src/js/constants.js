@@ -3,6 +3,9 @@
 const COLS = 10;
 const ROWS = 20;
 const BLOCK_SIZE = 30;
+
+const NEXTCOLS = 4;
+
 const KEY = {
     LEFT: 37,
     RIGHT: 39,
@@ -71,5 +74,5 @@ const POINTS = {
 };
 Object.freeze(POINTS);
 export {
-    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES, POINTS,
+    COLS, ROWS, BLOCK_SIZE, KEY, COLORS, SHAPES, POINTS, NEXTCOLS,
 };

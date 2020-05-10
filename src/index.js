@@ -1,13 +1,22 @@
 import './scss/style.scss';
 
 import {
-    COLS, ROWS, BLOCK_SIZE, KEY, POINTS,
+    COLS, ROWS, BLOCK_SIZE, KEY, POINTS, NEXTCOLS,
 } from './js/constants';
 import Board from './js/board';
 import Piece from './js/piece';
 
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
+
+const canvasNext = document.getElementById('next');
+const ctxNext = canvasNext.getContext('2d');
+
+
+ctxNext.canvas.width = NEXTCOLS * BLOCK_SIZE;
+ctxNext.canvas.height = NEXTCOLS * BLOCK_SIZE;
+
+ctxNext.scale(BLOCK_SIZE, BLOCK_SIZE);
 
 ctx.canvas.width = COLS * BLOCK_SIZE;
 ctx.canvas.height = ROWS * BLOCK_SIZE;
@@ -33,7 +42,7 @@ account = new Proxy(account, {
     },
 });
 
-const board = new Board(ctx, account);
+const board = new Board(ctx, account, ctxNext);
 
 
 const MOVES = {
@@ -44,33 +53,12 @@ const MOVES = {
     [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 }),
 };
 
-
-// let requestId;
-
-// const time = { start: 0, elapsed: 0 };
-
-// function animate(now = 0) {
-//     // Update elapsed time.
-//     time.elapsed = now - time.start;
-
-//     // If elapsed time has passed time for current level
-//     if (time.elapsed > Math.max(1000 - 50 * board.account.level, 20)) {
-//         console.log(now);
-//         // Restart counting from now
-//         time.start = now;
-//         board.drop();
-//     }
-
-//     // Clear board before drawing new state.
-//     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-//     board.draw();
-//     requestId = requestAnimationFrame(animate);
-// }
 function play(e) {
     e.target.blur();
     board.resetGame();
-    const piece = new Piece(ctx);
-    board.piece = piece;
+    board.piece = new Piece(ctx);
+    board.next = new Piece(ctx);
+    board.next.draw(ctxNext);
     board.animate();
 }
 

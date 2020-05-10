@@ -1,5 +1,5 @@
 import {
-    COLS, ROWS, COLORS, POINTS,
+    COLS, ROWS, COLORS, POINTS, NEXTCOLS,
 } from './constants';
 
 import Piece from './piece';
@@ -10,14 +10,18 @@ export default class Board {
 
     ctx;
 
+    ctxNext;
+
     account;
+
+    next;
 
     time = { start: 0, elapsed: 0 }
 
-    constructor(ctx, account) {
+    constructor(ctx, account, ctxNext) {
         this.ctx = ctx;
+        this.ctxNext = ctxNext;
         this.account = account;
-        // this.time = { start: 0, elapsed: 0 };
     }
 
     resetGame() {
@@ -102,8 +106,11 @@ export default class Board {
             }
             this.freeze();
             this.removeFullLine();
-            this.piece = new Piece();
-            this.piece.ctx = this.ctx;
+            this.piece = this.next;
+            this.next = new Piece(this.ctx);
+            this.ctxNext.fillStyle = 'white';
+            this.ctxNext.fillRect(0, 0, NEXTCOLS, NEXTCOLS);
+            this.next.draw(this.ctxNext);
         }
         return true;
     }
